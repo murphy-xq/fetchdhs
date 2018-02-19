@@ -1,0 +1,19 @@
+Package: fetchdhs
+Title: Retrieve DHS API Data
+Version: 0.1.0
+Authors@R: person("Padraic", "Murphy", email = "murfyxq@gmail.com", role = c("aut", "cre"))
+Description: A suite of convenience functions to retrieve survey data from the DHS API.
+Depends: R (>= 3.4.1)
+License: MIT + file LICENCE
+Encoding: UTF-8
+LazyData: true
+RoxygenNote: 6.0.1
+Imports: dplyr,
+    glue,
+    jsonlite,
+    purrr,
+    stringr,
+    snakecase,
+    magrittr,
+    httr,
+    attempt
