@@ -17,3 +17,5 @@ Imports: dplyr,
     magrittr,
     httr,
     attempt
+URL: https://github.com/murphy-xq/fetchdhs
+BugReports: https://github.com/murphy-xq/fetchdhs/issues
