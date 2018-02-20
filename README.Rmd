@@ -15,6 +15,8 @@ library(fetchdhs)
 library(tidyverse)
 ```
 
+[![Travis-CI Build Status](https://travis-ci.org/murphy-xq/fetchdhs.svg?branch=master)](https://travis-ci.org/murphy-xq/fetchdhs)
+
 # fetchdhs
 
 A suite of convenience functions to retrieve tidy dataframes of survey data from the [DHS API](https://api.dhsprogram.com/)
