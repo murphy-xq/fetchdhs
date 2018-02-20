@@ -35,7 +35,9 @@ fetch_countries() %>%
 #> 2 NGA                NG               Nigeria
 ```
 
-Next, make use of [DHS API tags](https://api.dhsprogram.com/rest/dhs/tags?f=html) that categorize survey indicators by topic. In this example, we are looking for all immunization-related indicators using `fetch_tags()` and identify tag `32` \* Note that only 1 tag may be specified per call
+Next, make use of [DHS API tags](https://api.dhsprogram.com/rest/dhs/tags?f=html) that categorize survey indicators by topic. In this example, we are looking for all immunization-related indicators using `fetch_tags()` and identify tag `32`
+
+-   Note that only 1 tag may be specified per call
 
 ``` r
 fetch_tags() %>% 
