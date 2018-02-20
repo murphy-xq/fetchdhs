@@ -1,39 +1,39 @@
 #' Retrieve DHS API data
 #'
-#' \code{fetch_data} retrieves DHS API data and returns a dataframe with arguments to specify countries, years, indicators, tags, and level of disaggregation.
+#' \code{fetch_data} retrieves DHS API data and returns a dataframe with arguments to specify countries, years, indicators, tag, and level of disaggregation.
 #' @details Set DHS API key with \code{\link{set_api_key}} and return fields with \code{\link{set_return_fields}}.
 #' @param countries Specify countries by DHS country code. Use \code{fetch_countries} for listing of DHS country codes.
 #' @param years Specify survey year(s)
 #' @param indicators Specify indicators by indicator_id. Use \code{fetch_indicators} for indicator details including indicator_ids.
-#' @param tags Specify tag. Use \code{fetch_tags} for details. NOTE: only 1 tag can be specified per call.
+#' @param tag Specify tag. Use \code{fetch_tags} for details. NOTE: only 1 tag can be specified per call.
 #' @param breakdown_level Specify level of data disaggregation. Options include "national" (default), "subnational", "background", and "all".
 #' @param add_geometry Set to "true" for inclusion of polygon coordinates.
 #' @return A list containing the API call and dataframe of the results.
 #' @seealso \code{\link{fetch_countries}}, \code{\link{fetch_indicators}}, \code{\link{fetch_tags}}
 #' @examples
 #' # Return all immunization tagged data for Ghana and Kenya from 2010 to 2016
-#' fetch_data(countries = c("GH", "KE"), years = 2010:2016, tags = 32, breakdown_level = "all")
+#' fetch_data(countries = c("GH", "KE"), years = 2010:2016, tag = 32, breakdown_level = "all")
 #'
 #' # Return all national-level data for "Assistance during delivery from a skilled provider" and
 #' "Treatment of diarrhea: Taken to a health facility"
 #' fetch_data(indicators = c("RH_DELA_C_SKP", "CH_DIAT_C_ADV"), breakdown_level = "national")
 #'
 #' # Return all 2016 data with geometry for the tag "SDGs"
-#' fetch_data(years = 2016, tags = 80, add_geometry = "true")
+#' fetch_data(years = 2016, tag = 80, add_geometry = "true")
 #' @importFrom magrittr %>%
 #' @importFrom magrittr %<>%
 #' @export
-fetch_data <- function(countries = NULL, years = NULL, indicators = NULL, tags = NULL, breakdown_level = NULL, add_geometry = NULL) {
+fetch_data <- function(countries = NULL, years = NULL, indicators = NULL, tag = NULL, breakdown_level = NULL, add_geometry = NULL) {
   
   # check args
-  attempt::stop_if_all(c(countries, years, indicators, tags, breakdown_level), is.null, "Please specify at least one argument")
-  attempt::stop_if(tags, ~ length(.x) > 1, "Only one tag may be specified per call")
+  attempt::stop_if_all(c(countries, years, indicators, tag, breakdown_level), is.null, "Please specify at least one argument")
+  attempt::stop_if(tag, ~ length(.x) > 1, "Only one tag may be specified per call")
   
   # collapse args with multiple inputs
   countries  <- stringr::str_c(countries, collapse = ",")
   years      <- stringr::str_c(years, collapse = ",")
   indicators <- stringr::str_c(indicators, collapse = ",")
-  tags       <- stringr::str_c(tags, collapse = ",")
+  tag        <- stringr::str_c(tag, collapse = ",")
 
   # optional args
   returnFields <- dplyr::if_else(is.null(getOption("return_fields")), "", getOption("return_fields"))    # from set_return_fields()
@@ -46,7 +46,7 @@ fetch_data <- function(countries = NULL, years = NULL, indicators = NULL, tags =
       countryIds = countries,
       surveyYear = years,
       indicatorIds = indicators,
-      tagIds = tags,
+      tagIds = tag,
       breakdown = breakdown_level,
       returnGeometry = add_geometry,
       returnFields = returnFields,
