@@ -1,5 +1,5 @@
 Package: fetchdhs
-Title: Retrieve DHS API Data
+Title: Retrieve DHS API Data with R
 Version: 0.1.0
 Authors@R: person("Padraic", "Murphy", email = "murfyxq@gmail.com", role = c("aut", "cre"))
 Description: A suite of convenience functions to retrieve survey data from the DHS API.
