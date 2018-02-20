@@ -11,7 +11,6 @@ Installation
 ``` r
 # install.packages("devtools")
 devtools::install_github("murphy-xq/fetchdhs")
-library(fetchdhs)
 ```
 
 Basic example
@@ -51,7 +50,7 @@ fetch_tags() %>%
 Finally, use `fetch_data()` to call the DHS API using the parameters just identified and receive a tidy dataframe as well as the api call:
 
 ``` r
-fetch_data(countries = c("IA","NG"), tags = 32, years = 2000:2017)
+fetch_data(countries = c("IA","NG"), tag = 32, years = 2000:2017)
 #> 1 page to extract
 #> Retrieving page 1
 #> $df
@@ -82,6 +81,56 @@ fetch_data(countries = c("IA","NG"), tags = 32, years = 2000:2017)
 #> [1] "http://api.dhsprogram.com/rest/dhs/data?countryIds=IA%2CNG&surveyYear=2000%2C2001%2C2002%2C2003%2C2004%2C2005%2C2006%2C2007%2C2008%2C2009%2C2010%2C2011%2C2012%2C2013%2C2014%2C2015%2C2016%2C2017&tagIds=32&returnFields=&apiKey=&perpage=1000"
 ```
 
+For specific indicators, we can peak at a dataframe of all available indicators to identify which indicator id codes should be included with `fetch_data()`. Let's try pulling only DPT3 and Measles indicators:
+
+``` r
+fetch_indicators() %>% 
+  filter(str_detect(definition, "Measles|DPT3"))
+#> # A tibble: 5 x 9
+#>   tag_ids indicator_id  label  short_name definition   denominator level_1
+#>   <chr>   <chr>         <chr>  <chr>      <chr>        <chr>       <chr>  
+#> 1 32, 7   CH_VAC1_C_DP3 DPT3 … DPT3       Percentage … "Children … Child …
+#> 2 32, 7   CH_VAC1_C_MSL Measl… Measles    Percentage … "Children … Child …
+#> 3 32, 77  CH_VACC_C_DP3 DPT3 … DPT3       Percentage … "Children … Child …
+#> 4 32, 77  CH_VACC_C_MSL Measl… Measles    Percentage … "Children … Child …
+#> 5 32, 1   CH_VACS_C_MSL Measl… Measles    Percentage … "Children … Child …
+#> # ... with 2 more variables: level_2 <chr>, level_3 <chr>
+```
+
+Upon investigating the DPT3 and Measles indicators and their associated [attributes](https://api.dhsprogram.com/rest/dhs/indicators/fields), we see that `CH_VACC_C_DP3` and `CH_VACC_C_MSL` are the indicator ids to include in `fetch_data()`:
+
+``` r
+fetch_data(countries = c("IA","NG"), indicators = c("CH_VACC_C_DP3", "CH_VACC_C_MSL"), years = 2000:2017)
+#> 1 page to extract
+#> Retrieving page 1
+#> $df
+#> # A tibble: 10 x 27
+#>    data_id indicator         survey_id is_preferred value sdrid  precision
+#>      <int> <chr>             <chr>            <int> <dbl> <chr>      <dbl>
+#>  1  389862 DPT3 vaccination… IA2006DHS            1  55.3 CHVAC…      1.00
+#>  2  389869 Measles vaccinat… IA2006DHS            1  58.8 CHVAC…      1.00
+#>  3  149011 DPT3 vaccination… IA2015DHS            1  78.4 CHVAC…      1.00
+#>  4  149013 Measles vaccinat… IA2015DHS            1  81.1 CHVAC…      1.00
+#>  5   47192 DPT3 vaccination… NG2003DHS            1  21.4 CHVAC…      1.00
+#>  6   47210 Measles vaccinat… NG2003DHS            1  35.9 CHVAC…      1.00
+#>  7   47399 DPT3 vaccination… NG2008DHS            1  35.4 CHVAC…      1.00
+#>  8   47400 Measles vaccinat… NG2008DHS            1  41.4 CHVAC…      1.00
+#>  9  426366 DPT3 vaccination… NG2013DHS            1  38.2 CHVAC…      1.00
+#> 10  426367 Measles vaccinat… NG2013DHS            1  42.1 CHVAC…      1.00
+#> # ... with 20 more variables: region_id <chr>, survey_year_label <chr>,
+#> #   survey_type <chr>, survey_year <int>, indicator_order <int>,
+#> #   dhs_country_code <chr>, ci_low <dbl>, country_name <chr>,
+#> #   indicator_type <chr>, characteristic_id <dbl>,
+#> #   characteristic_category <chr>, indicator_id <chr>,
+#> #   characteristic_order <int>, characteristic_label <chr>,
+#> #   by_variable_label <chr>, denominator_unweighted <dbl>,
+#> #   denominator_weighted <dbl>, ci_high <dbl>, is_total <int>,
+#> #   by_variable_id <int>
+#> 
+#> $url
+#> [1] "http://api.dhsprogram.com/rest/dhs/data?countryIds=IA%2CNG&surveyYear=2000%2C2001%2C2002%2C2003%2C2004%2C2005%2C2006%2C2007%2C2008%2C2009%2C2010%2C2011%2C2012%2C2013%2C2014%2C2015%2C2016%2C2017&indicatorIds=CH_VACC_C_DP3%2CCH_VACC_C_MSL&returnFields=&apiKey=&perpage=1000"
+```
+
 Additional features
 -------------------
 
@@ -93,7 +142,7 @@ We have been using the default level of disaggregation which returns national-le
 
 ``` r
 # national (default)
-fetch_data(countries = c("IA","NG"), tags = 32, years = 2000:2017, breakdown_level = "national")
+fetch_data(countries = c("IA","NG"), tag = 32, years = 2000:2017, breakdown_level = "national")
 #> 1 page to extract
 #> Retrieving page 1
 #> $df
@@ -124,7 +173,7 @@ fetch_data(countries = c("IA","NG"), tags = 32, years = 2000:2017, breakdown_lev
 #> [1] "http://api.dhsprogram.com/rest/dhs/data?countryIds=IA%2CNG&surveyYear=2000%2C2001%2C2002%2C2003%2C2004%2C2005%2C2006%2C2007%2C2008%2C2009%2C2010%2C2011%2C2012%2C2013%2C2014%2C2015%2C2016%2C2017&tagIds=32&breakdown=national&returnFields=&apiKey=&perpage=1000"
 
 # subnational
-fetch_data(countries = c("IA","NG"), tags = 32, years = 2000:2017, breakdown_level = "subnational")
+fetch_data(countries = c("IA","NG"), tag = 32, years = 2000:2017, breakdown_level = "subnational")
 #> 2 pages to extract
 #> Retrieving page 1
 #> Retrieving page 2
@@ -156,7 +205,7 @@ fetch_data(countries = c("IA","NG"), tags = 32, years = 2000:2017, breakdown_lev
 #> [1] "http://api.dhsprogram.com/rest/dhs/data?countryIds=IA%2CNG&surveyYear=2000%2C2001%2C2002%2C2003%2C2004%2C2005%2C2006%2C2007%2C2008%2C2009%2C2010%2C2011%2C2012%2C2013%2C2014%2C2015%2C2016%2C2017&tagIds=32&breakdown=subnational&returnFields=&apiKey=&perpage=1000"
 
 # background
-fetch_data(countries = c("IA","NG"), tags = 32, years = 2000:2017, breakdown_level = "background")
+fetch_data(countries = c("IA","NG"), tag = 32, years = 2000:2017, breakdown_level = "background")
 #> 4 pages to extract
 #> Retrieving page 1
 #> Retrieving page 2
@@ -190,7 +239,7 @@ fetch_data(countries = c("IA","NG"), tags = 32, years = 2000:2017, breakdown_lev
 #> [1] "http://api.dhsprogram.com/rest/dhs/data?countryIds=IA%2CNG&surveyYear=2000%2C2001%2C2002%2C2003%2C2004%2C2005%2C2006%2C2007%2C2008%2C2009%2C2010%2C2011%2C2012%2C2013%2C2014%2C2015%2C2016%2C2017&tagIds=32&breakdown=background&returnFields=&apiKey=&perpage=1000"
 
 # all
-fetch_data(countries = c("IA","NG"), tags = 32, years = 2000:2017, breakdown_level = "all")
+fetch_data(countries = c("IA","NG"), tag = 32, years = 2000:2017, breakdown_level = "all")
 #> 4 pages to extract
 #> Retrieving page 1
 #> Retrieving page 2
@@ -226,12 +275,12 @@ fetch_data(countries = c("IA","NG"), tags = 32, years = 2000:2017, breakdown_lev
 
 #### Return fields
 
-[Return fields](https://api.dhsprogram.com/rest/dhs/data/fields) are the various dimensions of survey data that can returned. Using `set_return_fields()`, we can input any desired fields so that a custom, consistent dataframe is returned
+[Return fields](https://api.dhsprogram.com/rest/dhs/data/fields) are the various dimensions of survey data that can be returned. `set_return_fields()` allows the user to specify which fields should comprise the dataframe returned from the api
 
 ``` r
 set_return_fields(c("Indicator", "CountryName", "SurveyYear", "SurveyType", "Value"))
 
-fetch_data(countries = c("IA","NG"), tags = 32, years = 2000:2017)
+fetch_data(countries = c("IA","NG"), tag = 32, years = 2000:2017)
 #> 1 page to extract
 #> Retrieving page 1
 #> $df
@@ -259,7 +308,7 @@ fetch_data(countries = c("IA","NG"), tags = 32, years = 2000:2017)
 We can also include polygon coordinates with our call with `add_geometry`
 
 ``` r
-fetch_data(countries = c("IA","NG"), tags = 32, years = 2000:2017, add_geometry = TRUE)
+fetch_data(countries = c("IA","NG"), tag = 32, years = 2000:2017, add_geometry = TRUE)
 #> 1 page to extract
 #> Retrieving page 1
 #> $df
