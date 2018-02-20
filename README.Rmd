@@ -1,0 +1,105 @@
+---
+output: github_document
+---
+
+<!-- README.md is generated from README.Rmd. Please edit that file -->
+
+```{r setup, echo = FALSE, include=FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>",
+  fig.path = "README-"
+)
+
+library(fetchdhs)
+library(tidyverse)
+```
+
+# fetchdhs
+
+A suite of convenience functions to retrieve tidy dataframes of survey data from the [DHS API](https://api.dhsprogram.com/)
+
+## Installation
+```{r installation, eval = FALSE}
+# install.packages("devtools")
+devtools::install_github("murphy-xq/fetchdhs")
+library(fetchdhs)
+```
+
+## Basic example
+
+Let's say you quickly need DHS survey data for:
+
+* immunization-related indicators
+* since 2000
+* for India and Nigeria
+
+First, use `fetch_countries()` to locate the 2-letter DHS country codes for India and Nigeria needed for the api call
+
+```{r country_list_filter}
+fetch_countries() %>% 
+  filter(country_name %in% c("India", "Nigeria"))
+```
+
+Next, make use of [DHS API tags](https://api.dhsprogram.com/rest/dhs/tags?f=html) that categorize survey indicators by topic. In this example, we are looking for all immunization-related indicators using `fetch_tags()` and identify tag `32`
+* Note that only 1 tag may be specified per call
+
+```{r tags_list}
+fetch_tags() %>% 
+  filter(str_detect(tag_name,  "[Ii]mmunization"))
+```
+
+Finally, use `fetch_data()` to call the DHS API using the parameters just identified and receive a tidy dataframe as well as the api call:
+
+```{r fetch_dta}
+fetch_data(countries = c("IA","NG"), tags = 32, years = 2000:2017)
+```
+
+## Additional features
+
+#### Level of disaggregation
+
+We have been using the default level of disaggregation which returns national-level data only. In order to pull subnational, background characteristic, or all available data, we need to specify the `breakdown_level` in `fetch_data()`
+
+* Note the increasing amount of records returned as we move from the default `breakdown_level == "national"` (205 records) to `breakdown_level == "all"` (3,270 records)
+
+```{r breakdown}
+# national (default)
+fetch_data(countries = c("IA","NG"), tags = 32, years = 2000:2017, breakdown_level = "national")
+
+# subnational
+fetch_data(countries = c("IA","NG"), tags = 32, years = 2000:2017, breakdown_level = "subnational")
+
+# background
+fetch_data(countries = c("IA","NG"), tags = 32, years = 2000:2017, breakdown_level = "background")
+
+# all
+fetch_data(countries = c("IA","NG"), tags = 32, years = 2000:2017, breakdown_level = "all")
+```
+
+#### Return fields
+
+[Return fields](https://api.dhsprogram.com/rest/dhs/data/fields) are the various dimensions of survey data that can returned. Using `set_return_fields()`, we can input any desired fields so that a custom, consistent dataframe is returned
+
+```{r return_field}
+set_return_fields(c("Indicator", "CountryName", "SurveyYear", "SurveyType", "Value"))
+
+fetch_data(countries = c("IA","NG"), tags = 32, years = 2000:2017)
+```
+
+#### Add geospatial data
+
+We can also include polygon coordinates with our call with `add_geometry`
+
+```{r add_geom}
+fetch_data(countries = c("IA","NG"), tags = 32, years = 2000:2017, add_geometry = TRUE)
+```
+
+
+#### API Key
+
+Authenticated users can query more records per page -- 5,000 versus 1,000 maximum records per page. Please see here for [authentication details](https://api.dhsprogram.com/#/introdevelop.html). Users can input their api key with `set_api_key()` for inclusion in any subsequent `fetch_data()` calls.
+
+```{r set_api_key}
+set_api_key("YOURKEY-GOESHERE")
+```
