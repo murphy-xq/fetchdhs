@@ -57,7 +57,7 @@ Finally, use `fetch_data()` to call the DHS API using the parameters just identi
 fetch_data(countries = c("IA","NG"), tag = 32, years = 2000:2017)
 ```
 
-For specific indicators, we can peak at a dataframe of all available indicators to identify which indicator id codes should be included with `fetch_data()`. Let's try pulling only DPT3 and Measles indicators:
+For specific indicators, we can peek at a dataframe of all available indicators to identify which indicator id codes should be included with `fetch_data()`. Let's try pulling only DPT3 and Measles indicators:
 
 ```{r find_indicators}
 fetch_indicators() %>% 

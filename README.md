@@ -83,7 +83,7 @@ fetch_data(countries = c("IA","NG"), tag = 32, years = 2000:2017)
 #> [1] "http://api.dhsprogram.com/rest/dhs/data?countryIds=IA%2CNG&surveyYear=2000%2C2001%2C2002%2C2003%2C2004%2C2005%2C2006%2C2007%2C2008%2C2009%2C2010%2C2011%2C2012%2C2013%2C2014%2C2015%2C2016%2C2017&tagIds=32&returnFields=&apiKey=&perpage=1000"
 ```
 
-For specific indicators, we can peak at a dataframe of all available indicators to identify which indicator id codes should be included with `fetch_data()`. Let's try pulling only DPT3 and Measles indicators:
+For specific indicators, we can peek at a dataframe of all available indicators to identify which indicator id codes should be included with `fetch_data()`. Let's try pulling only DPT3 and Measles indicators:
 
 ``` r
 fetch_indicators() %>% 
