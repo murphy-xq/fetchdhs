@@ -38,8 +38,6 @@ fetch_countries() %>%
 
 Next, make use of [DHS API tags](https://api.dhsprogram.com/rest/dhs/tags?f=html) that categorize survey indicators by topic. In this example, we are looking for all immunization-related indicators using `fetch_tags()` and identify tag `32`
 
--   Note that only 1 tag may be specified per call
-
 ``` r
 fetch_tags() %>% 
   filter(str_detect(tag_name,  "[Ii]mmunization"))
@@ -51,55 +49,52 @@ fetch_tags() %>%
 
 Finally, use `fetch_data()` to call the DHS API using the parameters just identified and receive a tidy dataframe as well as the api call:
 
+-   Note only 1 tag may be specified
+
 ``` r
 fetch_data(countries = c("IA","NG"), tag = 32, years = 2000:2017)
 #> 1 page to extract
 #> Retrieving page 1
 #> $df
 #> # A tibble: 205 x 27
-#>    data_id indicator         survey_id is_preferred value sdrid  precision
-#>      <int> <chr>             <chr>            <int> <dbl> <chr>      <dbl>
-#>  1  201888 BCG vaccination … IA2006DHS            1  78.1 CHVAC…      1.00
-#>  2  201889 DPT 1 vaccinatio… IA2006DHS            1  76.0 CHVAC…      1.00
-#>  3  201890 DPT 2 vaccinatio… IA2006DHS            1  66.7 CHVAC…      1.00
-#>  4  201886 DPT 3 vaccinatio… IA2006DHS            1  55.3 CHVAC…      1.00
-#>  5  201895 Polio 0 vaccinat… IA2006DHS            1  48.4 CHVAC…      1.00
-#>  6  201887 Polio 1 vaccinat… IA2006DHS            1  93.1 CHVAC…      1.00
-#>  7  201896 Polio 2 vaccinat… IA2006DHS            1  88.8 CHVAC…      1.00
-#>  8  201893 Polio 3 vaccinat… IA2006DHS            1  78.2 CHVAC…      1.00
-#>  9  201894 Measles vaccinat… IA2006DHS            1  58.8 CHVAC…      1.00
-#> 10  201891 Received all 8 b… IA2006DHS            1  43.5 CHVAC…      1.00
-#> # ... with 195 more rows, and 20 more variables: region_id <chr>,
-#> #   survey_year_label <chr>, survey_type <chr>, survey_year <int>,
-#> #   indicator_order <int>, dhs_country_code <chr>, ci_low <dbl>,
-#> #   country_name <chr>, indicator_type <chr>, characteristic_id <dbl>,
-#> #   characteristic_category <chr>, indicator_id <chr>,
-#> #   characteristic_order <int>, characteristic_label <chr>,
-#> #   by_variable_label <chr>, denominator_unweighted <dbl>,
-#> #   denominator_weighted <dbl>, ci_high <dbl>, is_total <int>,
-#> #   by_variable_id <int>
+#>    data_id indicator     survey_id is_preferred value sdrid  precision region_id survey_year_lab… survey_type
+#>      <int> <chr>         <chr>            <int> <dbl> <chr>      <dbl> <chr>     <chr>            <chr>      
+#>  1  201888 BCG vaccinat… IA2006DHS            1  78.1 CHVAC…      1.00 <NA>      2005-06          DHS        
+#>  2  201889 DPT 1 vaccin… IA2006DHS            1  76.0 CHVAC…      1.00 <NA>      2005-06          DHS        
+#>  3  201890 DPT 2 vaccin… IA2006DHS            1  66.7 CHVAC…      1.00 <NA>      2005-06          DHS        
+#>  4  201886 DPT 3 vaccin… IA2006DHS            1  55.3 CHVAC…      1.00 <NA>      2005-06          DHS        
+#>  5  201895 Polio 0 vacc… IA2006DHS            1  48.4 CHVAC…      1.00 <NA>      2005-06          DHS        
+#>  6  201887 Polio 1 vacc… IA2006DHS            1  93.1 CHVAC…      1.00 <NA>      2005-06          DHS        
+#>  7  201896 Polio 2 vacc… IA2006DHS            1  88.8 CHVAC…      1.00 <NA>      2005-06          DHS        
+#>  8  201893 Polio 3 vacc… IA2006DHS            1  78.2 CHVAC…      1.00 <NA>      2005-06          DHS        
+#>  9  201894 Measles vacc… IA2006DHS            1  58.8 CHVAC…      1.00 <NA>      2005-06          DHS        
+#> 10  201891 Received all… IA2006DHS            1  43.5 CHVAC…      1.00 <NA>      2005-06          DHS        
+#> # ... with 195 more rows, and 17 more variables: survey_year <int>, indicator_order <int>,
+#> #   dhs_country_code <chr>, ci_low <dbl>, country_name <chr>, indicator_type <chr>, characteristic_id <dbl>,
+#> #   characteristic_category <chr>, indicator_id <chr>, characteristic_order <int>,
+#> #   characteristic_label <chr>, by_variable_label <chr>, denominator_unweighted <dbl>,
+#> #   denominator_weighted <dbl>, ci_high <dbl>, is_total <int>, by_variable_id <int>
 #> 
 #> $url
 #> [1] "http://api.dhsprogram.com/rest/dhs/data?countryIds=IA%2CNG&surveyYear=2000%2C2001%2C2002%2C2003%2C2004%2C2005%2C2006%2C2007%2C2008%2C2009%2C2010%2C2011%2C2012%2C2013%2C2014%2C2015%2C2016%2C2017&tagIds=32&returnFields=&apiKey=&perpage=1000"
 ```
 
-For specific indicators, we can peek at a dataframe of all available indicators to identify which indicator id codes should be included with `fetch_data()`. Let's try pulling only DPT3 and Measles indicators:
+For specific indicators, we can peek at a dataframe of all available indicators to identify which `indicator_id` codes should be included with `fetch_data()`. Let's try pulling only DPT3 and Measles indicators:
 
 ``` r
 fetch_indicators() %>% 
   filter(str_detect(definition, "Measles|DPT3"))
 #> # A tibble: 5 x 9
-#>   tag_ids indicator_id  label  short_name definition   denominator level_1
-#>   <chr>   <chr>         <chr>  <chr>      <chr>        <chr>       <chr>  
-#> 1 32, 7   CH_VAC1_C_DP3 DPT3 … DPT3       Percentage … "Children … Child …
-#> 2 32, 7   CH_VAC1_C_MSL Measl… Measles    Percentage … "Children … Child …
-#> 3 32, 77  CH_VACC_C_DP3 DPT3 … DPT3       Percentage … "Children … Child …
-#> 4 32, 77  CH_VACC_C_MSL Measl… Measles    Percentage … "Children … Child …
-#> 5 32, 1   CH_VACS_C_MSL Measl… Measles    Percentage … "Children … Child …
-#> # ... with 2 more variables: level_2 <chr>, level_3 <chr>
+#>   tag_ids indicator_id  label     short_name definition             denominator    level_1 level_2    level_3
+#>   <chr>   <chr>         <chr>     <chr>      <chr>                  <chr>          <chr>   <chr>      <chr>  
+#> 1 32, 7   CH_VAC1_C_DP3 DPT3 vac… DPT3       Percentage of childre… "Children age… Child … Vaccinati… Childr…
+#> 2 32, 7   CH_VAC1_C_MSL Measles … Measles    Percentage of childre… "Children age… Child … Vaccinati… Childr…
+#> 3 32, 77  CH_VACC_C_DP3 DPT3 vac… DPT3       Percentage of childre… "Children age… Child … Vaccinati… Childr…
+#> 4 32, 77  CH_VACC_C_MSL Measles … Measles    Percentage of childre… "Children age… Child … Vaccinati… Childr…
+#> 5 32, 1   CH_VACS_C_MSL Measles … Measles    Percentage of childre… "Children age… Child … Vaccinati… Childr…
 ```
 
-Upon investigating the DPT3 and Measles indicators and their associated [attributes](https://api.dhsprogram.com/rest/dhs/indicators/fields), we see that `CH_VACC_C_DP3` and `CH_VACC_C_MSL` are the indicator ids to include in `fetch_data()`:
+Upon investigating the DPT3 and Measles indicators and their associated [attributes](https://api.dhsprogram.com/rest/dhs/indicators/fields), we see that we need to use `CH_VACC_C_DP3` and `CH_VACC_C_MSL`:
 
 ``` r
 fetch_data(countries = c("IA","NG"), indicators = c("CH_VACC_C_DP3", "CH_VACC_C_MSL"), years = 2000:2017)
@@ -107,26 +102,22 @@ fetch_data(countries = c("IA","NG"), indicators = c("CH_VACC_C_DP3", "CH_VACC_C_
 #> Retrieving page 1
 #> $df
 #> # A tibble: 10 x 27
-#>    data_id indicator         survey_id is_preferred value sdrid  precision
-#>      <int> <chr>             <chr>            <int> <dbl> <chr>      <dbl>
-#>  1  389862 DPT3 vaccination… IA2006DHS            1  55.3 CHVAC…      1.00
-#>  2  389869 Measles vaccinat… IA2006DHS            1  58.8 CHVAC…      1.00
-#>  3  149011 DPT3 vaccination… IA2015DHS            1  78.4 CHVAC…      1.00
-#>  4  149013 Measles vaccinat… IA2015DHS            1  81.1 CHVAC…      1.00
-#>  5   47192 DPT3 vaccination… NG2003DHS            1  21.4 CHVAC…      1.00
-#>  6   47210 Measles vaccinat… NG2003DHS            1  35.9 CHVAC…      1.00
-#>  7   47399 DPT3 vaccination… NG2008DHS            1  35.4 CHVAC…      1.00
-#>  8   47400 Measles vaccinat… NG2008DHS            1  41.4 CHVAC…      1.00
-#>  9  426366 DPT3 vaccination… NG2013DHS            1  38.2 CHVAC…      1.00
-#> 10  426367 Measles vaccinat… NG2013DHS            1  42.1 CHVAC…      1.00
-#> # ... with 20 more variables: region_id <chr>, survey_year_label <chr>,
-#> #   survey_type <chr>, survey_year <int>, indicator_order <int>,
-#> #   dhs_country_code <chr>, ci_low <dbl>, country_name <chr>,
-#> #   indicator_type <chr>, characteristic_id <dbl>,
-#> #   characteristic_category <chr>, indicator_id <chr>,
-#> #   characteristic_order <int>, characteristic_label <chr>,
-#> #   by_variable_label <chr>, denominator_unweighted <dbl>,
-#> #   denominator_weighted <dbl>, ci_high <dbl>, is_total <int>,
+#>    data_id indicator     survey_id is_preferred value sdrid  precision region_id survey_year_lab… survey_type
+#>      <int> <chr>         <chr>            <int> <dbl> <chr>      <dbl> <chr>     <chr>            <chr>      
+#>  1  389862 DPT3 vaccina… IA2006DHS            1  55.3 CHVAC…      1.00 <NA>      2005-06          DHS        
+#>  2  389869 Measles vacc… IA2006DHS            1  58.8 CHVAC…      1.00 <NA>      2005-06          DHS        
+#>  3  149011 DPT3 vaccina… IA2015DHS            1  78.4 CHVAC…      1.00 <NA>      2015-16          DHS        
+#>  4  149013 Measles vacc… IA2015DHS            1  81.1 CHVAC…      1.00 <NA>      2015-16          DHS        
+#>  5   47192 DPT3 vaccina… NG2003DHS            1  21.4 CHVAC…      1.00 <NA>      2003             DHS        
+#>  6   47210 Measles vacc… NG2003DHS            1  35.9 CHVAC…      1.00 <NA>      2003             DHS        
+#>  7   47399 DPT3 vaccina… NG2008DHS            1  35.4 CHVAC…      1.00 <NA>      2008             DHS        
+#>  8   47400 Measles vacc… NG2008DHS            1  41.4 CHVAC…      1.00 <NA>      2008             DHS        
+#>  9  426366 DPT3 vaccina… NG2013DHS            1  38.2 CHVAC…      1.00 <NA>      2013             DHS        
+#> 10  426367 Measles vacc… NG2013DHS            1  42.1 CHVAC…      1.00 <NA>      2013             DHS        
+#> # ... with 17 more variables: survey_year <int>, indicator_order <int>, dhs_country_code <chr>, ci_low <dbl>,
+#> #   country_name <chr>, indicator_type <chr>, characteristic_id <dbl>, characteristic_category <chr>,
+#> #   indicator_id <chr>, characteristic_order <int>, characteristic_label <chr>, by_variable_label <chr>,
+#> #   denominator_unweighted <dbl>, denominator_weighted <dbl>, ci_high <dbl>, is_total <int>,
 #> #   by_variable_id <int>
 #> 
 #> $url
@@ -149,27 +140,23 @@ fetch_data(countries = c("IA","NG"), tag = 32, years = 2000:2017, breakdown_leve
 #> Retrieving page 1
 #> $df
 #> # A tibble: 205 x 27
-#>    data_id indicator         survey_id is_preferred value sdrid  precision
-#>      <int> <chr>             <chr>            <int> <dbl> <chr>      <dbl>
-#>  1  201888 BCG vaccination … IA2006DHS            1  78.1 CHVAC…      1.00
-#>  2  201889 DPT 1 vaccinatio… IA2006DHS            1  76.0 CHVAC…      1.00
-#>  3  201890 DPT 2 vaccinatio… IA2006DHS            1  66.7 CHVAC…      1.00
-#>  4  201886 DPT 3 vaccinatio… IA2006DHS            1  55.3 CHVAC…      1.00
-#>  5  201895 Polio 0 vaccinat… IA2006DHS            1  48.4 CHVAC…      1.00
-#>  6  201887 Polio 1 vaccinat… IA2006DHS            1  93.1 CHVAC…      1.00
-#>  7  201896 Polio 2 vaccinat… IA2006DHS            1  88.8 CHVAC…      1.00
-#>  8  201893 Polio 3 vaccinat… IA2006DHS            1  78.2 CHVAC…      1.00
-#>  9  201894 Measles vaccinat… IA2006DHS            1  58.8 CHVAC…      1.00
-#> 10  201891 Received all 8 b… IA2006DHS            1  43.5 CHVAC…      1.00
-#> # ... with 195 more rows, and 20 more variables: region_id <chr>,
-#> #   survey_year_label <chr>, survey_type <chr>, survey_year <int>,
-#> #   indicator_order <int>, dhs_country_code <chr>, ci_low <dbl>,
-#> #   country_name <chr>, indicator_type <chr>, characteristic_id <dbl>,
-#> #   characteristic_category <chr>, indicator_id <chr>,
-#> #   characteristic_order <int>, characteristic_label <chr>,
-#> #   by_variable_label <chr>, denominator_unweighted <dbl>,
-#> #   denominator_weighted <dbl>, ci_high <dbl>, is_total <int>,
-#> #   by_variable_id <int>
+#>    data_id indicator     survey_id is_preferred value sdrid  precision region_id survey_year_lab… survey_type
+#>      <int> <chr>         <chr>            <int> <dbl> <chr>      <dbl> <chr>     <chr>            <chr>      
+#>  1  201888 BCG vaccinat… IA2006DHS            1  78.1 CHVAC…      1.00 <NA>      2005-06          DHS        
+#>  2  201889 DPT 1 vaccin… IA2006DHS            1  76.0 CHVAC…      1.00 <NA>      2005-06          DHS        
+#>  3  201890 DPT 2 vaccin… IA2006DHS            1  66.7 CHVAC…      1.00 <NA>      2005-06          DHS        
+#>  4  201886 DPT 3 vaccin… IA2006DHS            1  55.3 CHVAC…      1.00 <NA>      2005-06          DHS        
+#>  5  201895 Polio 0 vacc… IA2006DHS            1  48.4 CHVAC…      1.00 <NA>      2005-06          DHS        
+#>  6  201887 Polio 1 vacc… IA2006DHS            1  93.1 CHVAC…      1.00 <NA>      2005-06          DHS        
+#>  7  201896 Polio 2 vacc… IA2006DHS            1  88.8 CHVAC…      1.00 <NA>      2005-06          DHS        
+#>  8  201893 Polio 3 vacc… IA2006DHS            1  78.2 CHVAC…      1.00 <NA>      2005-06          DHS        
+#>  9  201894 Measles vacc… IA2006DHS            1  58.8 CHVAC…      1.00 <NA>      2005-06          DHS        
+#> 10  201891 Received all… IA2006DHS            1  43.5 CHVAC…      1.00 <NA>      2005-06          DHS        
+#> # ... with 195 more rows, and 17 more variables: survey_year <int>, indicator_order <int>,
+#> #   dhs_country_code <chr>, ci_low <dbl>, country_name <chr>, indicator_type <chr>, characteristic_id <dbl>,
+#> #   characteristic_category <chr>, indicator_id <chr>, characteristic_order <int>,
+#> #   characteristic_label <chr>, by_variable_label <chr>, denominator_unweighted <dbl>,
+#> #   denominator_weighted <dbl>, ci_high <dbl>, is_total <int>, by_variable_id <int>
 #> 
 #> $url
 #> [1] "http://api.dhsprogram.com/rest/dhs/data?countryIds=IA%2CNG&surveyYear=2000%2C2001%2C2002%2C2003%2C2004%2C2005%2C2006%2C2007%2C2008%2C2009%2C2010%2C2011%2C2012%2C2013%2C2014%2C2015%2C2016%2C2017&tagIds=32&breakdown=national&returnFields=&apiKey=&perpage=1000"
@@ -181,27 +168,23 @@ fetch_data(countries = c("IA","NG"), tag = 32, years = 2000:2017, breakdown_leve
 #> Retrieving page 2
 #> $df
 #> # A tibble: 1,260 x 27
-#>    data_id indicator        survey_id is_preferred value sdrid   precision
-#>      <int> <chr>            <chr>            <int> <dbl> <chr>       <dbl>
-#>  1 2441926 BCG vaccination… IA2006DHS            1  87.0 CHVACC…      1.00
-#>  2  239491 BCG vaccination… IA2006DHS            1  84.9 CHVACC…      1.00
-#>  3 2523956 BCG vaccination… IA2006DHS            1  97.2 CHVACC…      1.00
-#>  4 3327965 BCG vaccination… IA2006DHS            1  90.9 CHVACC…      1.00
-#>  5 1511863 BCG vaccination… IA2006DHS            1  88.0 CHVACC…      1.00
-#>  6  235914 BCG vaccination… IA2006DHS            1  68.5 CHVACC…      1.00
-#>  7 2272599 BCG vaccination… IA2006DHS            1  81.4 CHVACC…      1.00
-#>  8  239513 BCG vaccination… IA2006DHS            1  80.5 CHVACC…      1.00
-#>  9 2750771 BCG vaccination… IA2006DHS            1  84.6 CHVACC…      1.00
-#> 10  237253 BCG vaccination… IA2006DHS            1  61.8 CHVACC…      1.00
-#> # ... with 1,250 more rows, and 20 more variables: region_id <chr>,
-#> #   survey_year_label <chr>, survey_type <chr>, survey_year <int>,
-#> #   indicator_order <int>, dhs_country_code <chr>, ci_low <dbl>,
-#> #   country_name <chr>, indicator_type <chr>, characteristic_id <dbl>,
-#> #   characteristic_category <chr>, indicator_id <chr>,
-#> #   characteristic_order <int>, characteristic_label <chr>,
-#> #   by_variable_label <chr>, denominator_unweighted <dbl>,
-#> #   denominator_weighted <dbl>, ci_high <dbl>, is_total <int>,
-#> #   by_variable_id <int>
+#>    data_id indicator    survey_id is_preferred value sdrid  precision region_id  survey_year_lab… survey_type
+#>      <int> <chr>        <chr>            <int> <dbl> <chr>      <dbl> <chr>      <chr>            <chr>      
+#>  1 2441926 BCG vaccina… IA2006DHS            1  87.0 CHVAC…      1.00 IADHS2006… 2005-06          DHS        
+#>  2  239491 BCG vaccina… IA2006DHS            1  84.9 CHVAC…      1.00 IADHS2006… 2005-06          DHS        
+#>  3 2523956 BCG vaccina… IA2006DHS            1  97.2 CHVAC…      1.00 IADHS2006… 2005-06          DHS        
+#>  4 3327965 BCG vaccina… IA2006DHS            1  90.9 CHVAC…      1.00 IADHS2006… 2005-06          DHS        
+#>  5 1511863 BCG vaccina… IA2006DHS            1  88.0 CHVAC…      1.00 IADHS2006… 2005-06          DHS        
+#>  6  235914 BCG vaccina… IA2006DHS            1  68.5 CHVAC…      1.00 IADHS2006… 2005-06          DHS        
+#>  7 2272599 BCG vaccina… IA2006DHS            1  81.4 CHVAC…      1.00 IADHS2006… 2005-06          DHS        
+#>  8  239513 BCG vaccina… IA2006DHS            1  80.5 CHVAC…      1.00 IADHS2006… 2005-06          DHS        
+#>  9 2750771 BCG vaccina… IA2006DHS            1  84.6 CHVAC…      1.00 IADHS2006… 2005-06          DHS        
+#> 10  237253 BCG vaccina… IA2006DHS            1  61.8 CHVAC…      1.00 IADHS2006… 2005-06          DHS        
+#> # ... with 1,250 more rows, and 17 more variables: survey_year <int>, indicator_order <int>,
+#> #   dhs_country_code <chr>, ci_low <dbl>, country_name <chr>, indicator_type <chr>, characteristic_id <dbl>,
+#> #   characteristic_category <chr>, indicator_id <chr>, characteristic_order <int>,
+#> #   characteristic_label <chr>, by_variable_label <chr>, denominator_unweighted <dbl>,
+#> #   denominator_weighted <dbl>, ci_high <dbl>, is_total <int>, by_variable_id <int>
 #> 
 #> $url
 #> [1] "http://api.dhsprogram.com/rest/dhs/data?countryIds=IA%2CNG&surveyYear=2000%2C2001%2C2002%2C2003%2C2004%2C2005%2C2006%2C2007%2C2008%2C2009%2C2010%2C2011%2C2012%2C2013%2C2014%2C2015%2C2016%2C2017&tagIds=32&breakdown=subnational&returnFields=&apiKey=&perpage=1000"
@@ -215,27 +198,23 @@ fetch_data(countries = c("IA","NG"), tag = 32, years = 2000:2017, breakdown_leve
 #> Retrieving page 4
 #> $df
 #> # A tibble: 3,065 x 27
-#>    data_id indicator        survey_id is_preferred value sdrid   precision
-#>      <int> <chr>            <chr>            <int> <dbl> <chr>       <dbl>
-#>  1 4098060 BCG vaccination… IA2006DHS            1  36.5 CHVACS…      1.00
-#>  2  749258 BCG vaccination… IA2006DHS            1  41.7 CHVACS…      1.00
-#>  3 9713062 BCG vaccination… IA2006DHS            1  75.6 CHVACS…      1.00
-#>  4 4098061 DPT 1 vaccinati… IA2006DHS            1  37.0 CHVACS…      1.00
-#>  5  749270 DPT 1 vaccinati… IA2006DHS            1  39.0 CHVACS…      1.00
-#>  6 9713063 DPT 1 vaccinati… IA2006DHS            1  72.8 CHVACS…      1.00
-#>  7 4098080 DPT 2 vaccinati… IA2006DHS            1  34.9 CHVACS…      1.00
-#>  8  749274 DPT 2 vaccinati… IA2006DHS            1  31.7 CHVACS…      1.00
-#>  9 9713064 DPT 2 vaccinati… IA2006DHS            1  63.3 CHVACS…      1.00
-#> 10 4098082 DPT 3 vaccinati… IA2006DHS            1  32.6 CHVACS…      1.00
-#> # ... with 3,055 more rows, and 20 more variables: region_id <chr>,
-#> #   survey_year_label <chr>, survey_type <chr>, survey_year <int>,
-#> #   indicator_order <int>, dhs_country_code <chr>, ci_low <dbl>,
-#> #   country_name <chr>, indicator_type <chr>, characteristic_id <dbl>,
-#> #   characteristic_category <chr>, indicator_id <chr>,
-#> #   characteristic_order <int>, characteristic_label <chr>,
-#> #   by_variable_label <chr>, denominator_unweighted <dbl>,
-#> #   denominator_weighted <dbl>, ci_high <dbl>, is_total <int>,
-#> #   by_variable_id <int>
+#>    data_id indicator     survey_id is_preferred value sdrid  precision region_id survey_year_lab… survey_type
+#>      <int> <chr>         <chr>            <int> <dbl> <chr>      <dbl> <chr>     <chr>            <chr>      
+#>  1 4098060 BCG vaccinat… IA2006DHS            1  36.5 CHVAC…      1.00 <NA>      2005-06          DHS        
+#>  2  749258 BCG vaccinat… IA2006DHS            1  41.7 CHVAC…      1.00 <NA>      2005-06          DHS        
+#>  3 9713062 BCG vaccinat… IA2006DHS            1  75.6 CHVAC…      1.00 <NA>      2005-06          DHS        
+#>  4 4098061 DPT 1 vaccin… IA2006DHS            1  37.0 CHVAC…      1.00 <NA>      2005-06          DHS        
+#>  5  749270 DPT 1 vaccin… IA2006DHS            1  39.0 CHVAC…      1.00 <NA>      2005-06          DHS        
+#>  6 9713063 DPT 1 vaccin… IA2006DHS            1  72.8 CHVAC…      1.00 <NA>      2005-06          DHS        
+#>  7 4098080 DPT 2 vaccin… IA2006DHS            1  34.9 CHVAC…      1.00 <NA>      2005-06          DHS        
+#>  8  749274 DPT 2 vaccin… IA2006DHS            1  31.7 CHVAC…      1.00 <NA>      2005-06          DHS        
+#>  9 9713064 DPT 2 vaccin… IA2006DHS            1  63.3 CHVAC…      1.00 <NA>      2005-06          DHS        
+#> 10 4098082 DPT 3 vaccin… IA2006DHS            1  32.6 CHVAC…      1.00 <NA>      2005-06          DHS        
+#> # ... with 3,055 more rows, and 17 more variables: survey_year <int>, indicator_order <int>,
+#> #   dhs_country_code <chr>, ci_low <dbl>, country_name <chr>, indicator_type <chr>, characteristic_id <dbl>,
+#> #   characteristic_category <chr>, indicator_id <chr>, characteristic_order <int>,
+#> #   characteristic_label <chr>, by_variable_label <chr>, denominator_unweighted <dbl>,
+#> #   denominator_weighted <dbl>, ci_high <dbl>, is_total <int>, by_variable_id <int>
 #> 
 #> $url
 #> [1] "http://api.dhsprogram.com/rest/dhs/data?countryIds=IA%2CNG&surveyYear=2000%2C2001%2C2002%2C2003%2C2004%2C2005%2C2006%2C2007%2C2008%2C2009%2C2010%2C2011%2C2012%2C2013%2C2014%2C2015%2C2016%2C2017&tagIds=32&breakdown=background&returnFields=&apiKey=&perpage=1000"
@@ -249,27 +228,23 @@ fetch_data(countries = c("IA","NG"), tag = 32, years = 2000:2017, breakdown_leve
 #> Retrieving page 4
 #> $df
 #> # A tibble: 3,270 x 27
-#>     data_id indicator        survey_id is_preferred value sdrid  precision
-#>       <int> <chr>            <chr>            <int> <dbl> <chr>      <dbl>
-#>  1  4289997 BCG vaccination… IA2006DHS            1  36.5 CHVAC…      1.00
-#>  2   810389 BCG vaccination… IA2006DHS            1  41.7 CHVAC…      1.00
-#>  3  4511541 BCG vaccination… IA2006DHS            1  78.1 CHVAC…      1.00
-#>  4 10160250 BCG vaccination… IA2006DHS            1  75.6 CHVAC…      1.00
-#>  5  4289998 DPT 1 vaccinati… IA2006DHS            1  37.0 CHVAC…      1.00
-#>  6   810401 DPT 1 vaccinati… IA2006DHS            1  39.0 CHVAC…      1.00
-#>  7  4511542 DPT 1 vaccinati… IA2006DHS            1  76.0 CHVAC…      1.00
-#>  8 10160251 DPT 1 vaccinati… IA2006DHS            1  72.8 CHVAC…      1.00
-#>  9  4290017 DPT 2 vaccinati… IA2006DHS            1  34.9 CHVAC…      1.00
-#> 10   810405 DPT 2 vaccinati… IA2006DHS            1  31.7 CHVAC…      1.00
-#> # ... with 3,260 more rows, and 20 more variables: region_id <chr>,
-#> #   survey_year_label <chr>, survey_type <chr>, survey_year <int>,
-#> #   indicator_order <int>, dhs_country_code <chr>, ci_low <dbl>,
-#> #   country_name <chr>, indicator_type <chr>, characteristic_id <dbl>,
-#> #   characteristic_category <chr>, indicator_id <chr>,
-#> #   characteristic_order <int>, characteristic_label <chr>,
-#> #   by_variable_label <chr>, denominator_unweighted <dbl>,
-#> #   denominator_weighted <dbl>, ci_high <dbl>, is_total <int>,
-#> #   by_variable_id <int>
+#>     data_id indicator    survey_id is_preferred value sdrid  precision region_id survey_year_lab… survey_type
+#>       <int> <chr>        <chr>            <int> <dbl> <chr>      <dbl> <chr>     <chr>            <chr>      
+#>  1  4289997 BCG vaccina… IA2006DHS            1  36.5 CHVAC…      1.00 <NA>      2005-06          DHS        
+#>  2   810389 BCG vaccina… IA2006DHS            1  41.7 CHVAC…      1.00 <NA>      2005-06          DHS        
+#>  3  4511541 BCG vaccina… IA2006DHS            1  78.1 CHVAC…      1.00 <NA>      2005-06          DHS        
+#>  4 10160250 BCG vaccina… IA2006DHS            1  75.6 CHVAC…      1.00 <NA>      2005-06          DHS        
+#>  5  4289998 DPT 1 vacci… IA2006DHS            1  37.0 CHVAC…      1.00 <NA>      2005-06          DHS        
+#>  6   810401 DPT 1 vacci… IA2006DHS            1  39.0 CHVAC…      1.00 <NA>      2005-06          DHS        
+#>  7  4511542 DPT 1 vacci… IA2006DHS            1  76.0 CHVAC…      1.00 <NA>      2005-06          DHS        
+#>  8 10160251 DPT 1 vacci… IA2006DHS            1  72.8 CHVAC…      1.00 <NA>      2005-06          DHS        
+#>  9  4290017 DPT 2 vacci… IA2006DHS            1  34.9 CHVAC…      1.00 <NA>      2005-06          DHS        
+#> 10   810405 DPT 2 vacci… IA2006DHS            1  31.7 CHVAC…      1.00 <NA>      2005-06          DHS        
+#> # ... with 3,260 more rows, and 17 more variables: survey_year <int>, indicator_order <int>,
+#> #   dhs_country_code <chr>, ci_low <dbl>, country_name <chr>, indicator_type <chr>, characteristic_id <dbl>,
+#> #   characteristic_category <chr>, indicator_id <chr>, characteristic_order <int>,
+#> #   characteristic_label <chr>, by_variable_label <chr>, denominator_unweighted <dbl>,
+#> #   denominator_weighted <dbl>, ci_high <dbl>, is_total <int>, by_variable_id <int>
 #> 
 #> $url
 #> [1] "http://api.dhsprogram.com/rest/dhs/data?countryIds=IA%2CNG&surveyYear=2000%2C2001%2C2002%2C2003%2C2004%2C2005%2C2006%2C2007%2C2008%2C2009%2C2010%2C2011%2C2012%2C2013%2C2014%2C2015%2C2016%2C2017&tagIds=32&breakdown=all&returnFields=&apiKey=&perpage=1000"
@@ -287,18 +262,18 @@ fetch_data(countries = c("IA","NG"), tag = 32, years = 2000:2017)
 #> Retrieving page 1
 #> $df
 #> # A tibble: 205 x 5
-#>    indicator                    survey_type survey_year value country_name
-#>    <chr>                        <chr>             <int> <dbl> <chr>       
-#>  1 BCG vaccination received     DHS                2006  78.1 India       
-#>  2 DPT 1 vaccination received   DHS                2006  76.0 India       
-#>  3 DPT 2 vaccination received   DHS                2006  66.7 India       
-#>  4 DPT 3 vaccination received   DHS                2006  55.3 India       
-#>  5 Polio 0 vaccination received DHS                2006  48.4 India       
-#>  6 Polio 1 vaccination received DHS                2006  93.1 India       
-#>  7 Polio 2 vaccination received DHS                2006  88.8 India       
-#>  8 Polio 3 vaccination received DHS                2006  78.2 India       
-#>  9 Measles vaccination received DHS                2006  58.8 India       
-#> 10 Received all 8 basic vaccin… DHS                2006  43.5 India       
+#>    indicator                         survey_type survey_year value country_name
+#>    <chr>                             <chr>             <int> <dbl> <chr>       
+#>  1 BCG vaccination received          DHS                2006  78.1 India       
+#>  2 DPT 1 vaccination received        DHS                2006  76.0 India       
+#>  3 DPT 2 vaccination received        DHS                2006  66.7 India       
+#>  4 DPT 3 vaccination received        DHS                2006  55.3 India       
+#>  5 Polio 0 vaccination received      DHS                2006  48.4 India       
+#>  6 Polio 1 vaccination received      DHS                2006  93.1 India       
+#>  7 Polio 2 vaccination received      DHS                2006  88.8 India       
+#>  8 Polio 3 vaccination received      DHS                2006  78.2 India       
+#>  9 Measles vaccination received      DHS                2006  58.8 India       
+#> 10 Received all 8 basic vaccinations DHS                2006  43.5 India       
 #> # ... with 195 more rows
 #> 
 #> $url
@@ -315,18 +290,18 @@ fetch_data(countries = c("IA","NG"), tag = 32, years = 2000:2017, add_geometry =
 #> Retrieving page 1
 #> $df
 #> # A tibble: 4,756 x 6
-#>    indicator  survey_type survey_year  value country_name coordinates     
-#>    <chr>      <chr>             <int>  <dbl> <chr>        <chr>           
-#>  1 BCG vacci… DHS                2003 4.83e¹ Nigeria      POLYGON ((8.283…
-#>  2 DPT 1 vac… DHS                2003 4.26e¹ Nigeria      POLYGON ((8.283…
-#>  3 DPT 2 vac… DHS                2003 3.17e¹ Nigeria      POLYGON ((8.283…
-#>  4 DPT 3 vac… DHS                2003 2.14e¹ Nigeria      POLYGON ((8.283…
-#>  5 Polio 0 v… DHS                2003 2.78e¹ Nigeria      POLYGON ((8.283…
-#>  6 Polio 1 v… DHS                2003 6.72e¹ Nigeria      POLYGON ((8.283…
-#>  7 Percentag… DHS                2013 2.04e¹ Nigeria      POLYGON ((8.283…
-#>  8 Number of… DHS                2013 2.27e⁴ Nigeria      POLYGON ((8.283…
-#>  9 Number of… DHS                2013 2.24e⁴ Nigeria      POLYGON ((8.283…
-#> 10 Polio1 va… DHS                2013 7.09e¹ Nigeria      POLYGON ((8.283…
+#>    indicator  survey_type survey_year  value country_name coordinates                                        
+#>    <chr>      <chr>             <int>  <dbl> <chr>        <chr>                                              
+#>  1 BCG vacci… DHS                2003 4.83e¹ Nigeria      POLYGON ((8.2837 4.834, 8.3057 4.812, 8.3057 4.79,…
+#>  2 DPT 1 vac… DHS                2003 4.26e¹ Nigeria      POLYGON ((8.2837 4.834, 8.3057 4.812, 8.3057 4.79,…
+#>  3 DPT 2 vac… DHS                2003 3.17e¹ Nigeria      POLYGON ((8.2837 4.834, 8.3057 4.812, 8.3057 4.79,…
+#>  4 DPT 3 vac… DHS                2003 2.14e¹ Nigeria      POLYGON ((8.2837 4.834, 8.3057 4.812, 8.3057 4.79,…
+#>  5 Polio 0 v… DHS                2003 2.78e¹ Nigeria      POLYGON ((8.2837 4.834, 8.3057 4.812, 8.3057 4.79,…
+#>  6 Polio 1 v… DHS                2003 6.72e¹ Nigeria      POLYGON ((8.2837 4.834, 8.3057 4.812, 8.3057 4.79,…
+#>  7 Percentag… DHS                2013 2.04e¹ Nigeria      POLYGON ((8.2837 4.834, 8.3057 4.812, 8.3057 4.79,…
+#>  8 Number of… DHS                2013 2.27e⁴ Nigeria      POLYGON ((8.2837 4.834, 8.3057 4.812, 8.3057 4.79,…
+#>  9 Number of… DHS                2013 2.24e⁴ Nigeria      POLYGON ((8.2837 4.834, 8.3057 4.812, 8.3057 4.79,…
+#> 10 Polio1 va… DHS                2013 7.09e¹ Nigeria      POLYGON ((8.2837 4.834, 8.3057 4.812, 8.3057 4.79,…
 #> # ... with 4,746 more rows
 #> 
 #> $url
@@ -335,7 +310,9 @@ fetch_data(countries = c("IA","NG"), tag = 32, years = 2000:2017, add_geometry =
 
 #### API Key
 
-Authenticated users can query more records per page -- 5,000 versus 1,000 maximum records per page. Please see here for [authentication details](https://api.dhsprogram.com/#/introdevelop.html). Users can input their api key with `set_api_key()` for inclusion in any subsequent `fetch_data()` calls.
+Authenticated users can query more records per page -- 5,000 versus 1,000 maximum records per page. Please see here for [authentication details](https://api.dhsprogram.com/#/introdevelop.html).
+
+Users can input their api key with `set_api_key()` for inclusion in any subsequent `fetch_data()` calls.
 
 ``` r
 set_api_key("YOURKEY-GOESHERE")

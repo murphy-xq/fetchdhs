@@ -10,6 +10,7 @@ knitr::opts_chunk$set(
   comment = "#>",
   fig.path = "README-"
 )
+options(width = 110)
 
 library(fetchdhs)
 library(tidyverse)
@@ -44,8 +45,6 @@ fetch_countries() %>%
 
 Next, make use of [DHS API tags](https://api.dhsprogram.com/rest/dhs/tags?f=html) that categorize survey indicators by topic. In this example, we are looking for all immunization-related indicators using `fetch_tags()` and identify tag `32`
 
-* Note that only 1 tag may be specified per call
-
 ```{r tags_list}
 fetch_tags() %>% 
   filter(str_detect(tag_name,  "[Ii]mmunization"))
@@ -53,18 +52,20 @@ fetch_tags() %>%
 
 Finally, use `fetch_data()` to call the DHS API using the parameters just identified and receive a tidy dataframe as well as the api call:
 
+* Note only 1 tag may be specified
+
 ```{r fetch_dta}
 fetch_data(countries = c("IA","NG"), tag = 32, years = 2000:2017)
 ```
 
-For specific indicators, we can peek at a dataframe of all available indicators to identify which indicator id codes should be included with `fetch_data()`. Let's try pulling only DPT3 and Measles indicators:
+For specific indicators, we can peek at a dataframe of all available indicators to identify which `indicator_id` codes should be included with `fetch_data()`. Let's try pulling only DPT3 and Measles indicators:
 
 ```{r find_indicators}
 fetch_indicators() %>% 
   filter(str_detect(definition, "Measles|DPT3"))
 ```
 
-Upon investigating the DPT3 and Measles indicators and their associated [attributes](https://api.dhsprogram.com/rest/dhs/indicators/fields), we see that `CH_VACC_C_DP3` and `CH_VACC_C_MSL` are the indicator ids to include in `fetch_data()`:
+Upon investigating the DPT3 and Measles indicators and their associated [attributes](https://api.dhsprogram.com/rest/dhs/indicators/fields), we see that we need to use `CH_VACC_C_DP3` and `CH_VACC_C_MSL`:
 
 ```{r fetch_indicator}
 fetch_data(countries = c("IA","NG"), indicators = c("CH_VACC_C_DP3", "CH_VACC_C_MSL"), years = 2000:2017)
@@ -113,7 +114,9 @@ fetch_data(countries = c("IA","NG"), tag = 32, years = 2000:2017, add_geometry =
 
 #### API Key
 
-Authenticated users can query more records per page -- 5,000 versus 1,000 maximum records per page. Please see here for [authentication details](https://api.dhsprogram.com/#/introdevelop.html). Users can input their api key with `set_api_key()` for inclusion in any subsequent `fetch_data()` calls.
+Authenticated users can query more records per page -- 5,000 versus 1,000 maximum records per page. Please see here for [authentication details](https://api.dhsprogram.com/#/introdevelop.html).
+
+Users can input their api key with `set_api_key()` for inclusion in any subsequent `fetch_data()` calls.
 
 ```{r set_api_key}
 set_api_key("YOURKEY-GOESHERE")
