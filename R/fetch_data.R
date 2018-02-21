@@ -86,15 +86,14 @@ fetch_data <- function(countries = NULL, years = NULL, indicators = NULL, tag = 
     jsonlite::fromJSON(rawToChar(res[["content"]]))[["Data"]] %>% 
       # coerce inconsistsent return fields
       dplyr::mutate_at(dplyr::vars(dplyr::contains("SurveyYearLabel")), dplyr::funs(as.character)) %>% 
-      dplyr::mutate_at(dplyr::vars(dplyr::contains("Denominator")), dplyr::funs(as.numeric)) %>%
-      dplyr::mutate_at(dplyr::vars(dplyr::contains("CI")), dplyr::funs(as.numeric)) %>%
-      dplyr::mutate_at(dplyr::vars(dplyr::contains("ByVariableLabel")), dplyr::funs(dplyr::na_if(. , "")))
+      dplyr::mutate_at(dplyr::vars(dplyr::matches("CI|Denominator")), dplyr::funs(as.numeric))
   }
   
   # output
   df <- purrr::map_df(seq_len(n_pgs), extract_json) %>% 
+    dplyr::as_data_frame() %>% 
     dplyr::rename_all(snakecase::to_snake_case) %>% 
-    dplyr::as_data_frame()
+    dplyr::na_if(., "")
   
   return(list(df = df, url = url))
 }
