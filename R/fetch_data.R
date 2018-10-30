@@ -84,7 +84,7 @@ fetch_data <- function(countries = NULL, years = NULL, indicators = NULL, tag = 
     res <- httr::GET(base_url, query = args)
     
     jsonlite::fromJSON(rawToChar(res[["content"]]))[["Data"]] %>% 
-      # coerce inconsistsent return fields
+      # coerce inconsistent return field types
       dplyr::mutate_at(dplyr::vars(dplyr::contains("SurveyYearLabel")), dplyr::funs(as.character)) %>% 
       dplyr::mutate_at(dplyr::vars(dplyr::matches("CI|Denominator")), dplyr::funs(as.numeric))
   }
