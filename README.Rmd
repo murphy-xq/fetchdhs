@@ -20,7 +20,7 @@ library(tidyverse)
 
 # fetchdhs
 
-A suite of convenience functions to retrieve tidy dataframes of survey data from the [DHS API](https://api.dhsprogram.com/)
+The [Demographic and Health Surveys (DHS) Program](https://www.dhsprogram.com/) has conducted more than 400 surveys in over 90 countries since 1984. It remains a critical resource in global health research and analytics as it provides nationally representative data on fertility, family planning, maternal and child health, gender, HIV/AIDS, malaria, and nutrition. The objective of this package is to enable R users to plug into the [DHS API](https://api.dhsprogram.com/) and retrieve tidy survey data.
 
 ## Installation
 ```{r installation, eval = FALSE}
@@ -114,7 +114,7 @@ fetch_data(countries = c("IA","NG"), tag = 32, years = 2000:2017, add_geometry =
 
 #### API Key
 
-Authenticated users can query more records per page -- 5,000 versus 1,000 maximum records per page. Please see here for [authentication details](https://api.dhsprogram.com/#/introdevelop.html).
+Authenticated users can query more records per page -- 5,000 versus 1,000 maximum records per page. Please see [here](https://api.dhsprogram.com/#/introdevelop.html) for authentication details.
 
 Users can input their api key with `set_api_key()` for inclusion in any subsequent `fetch_data()` calls.
 
